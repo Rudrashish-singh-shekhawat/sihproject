@@ -18,8 +18,8 @@ function Dashboard() {
   // Sample Data
   const energyData = [
     { name: "Solar", value: 40 },
-    { name: "Wind", value: 40 },
-    { name: "Other", value: 20 },
+    { name: "Wind", value: 30 },
+    { name: "Other", value: 30 },
   ];
 
   const storageData = [

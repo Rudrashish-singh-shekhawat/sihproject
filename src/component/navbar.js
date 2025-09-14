@@ -1,53 +1,54 @@
 import logo from "../source/logo.svg";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import {app} from "../firebase";
-import Micon from "../source/menicon.jpg"
+import { app } from "../firebase";
+import Micon from "../source/menicon.jpg";
 
-const auth = getAuth();
+const auth = getAuth(app);
 
 function Nav() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isLogin = location.pathname === "/login";
   const isSignup = location.pathname === "/signup";
-  const [open, setOpen] = React.useState(false);
-  const [user, setUser] = React.useState(null);
-  const [dropdown, setDropdown]= React.useState(false);
-  const dropdownRef =useRef(null);
 
-  //track firbase Auth state 
+  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [dropdown, setDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
- useEffect(()=>{
-  const unsubscribe = onAuthStateChanged(auth,(currentUser)=>{
-    setUser(currentUser);
-  });
-  return () => unsubscribe();
- }, []);
+  // Track Firebase auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
- //close dropdown when clicking outside
- useEffect(()=>{
-  const handleClickOutside= (e)=>{
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target)){
-      setDropdown(false);
-    }
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Logout
+  const handleLogout = async () => {
+    await signOut(auth);
+    setDropdown(false);
+    setOpen(false);
   };
-  document.addEventListener('mousedown', handleClickOutside);
-  return ()=> document.removeEventListener("mousedown", handleClickOutside);
- },[]);
- //logout
- const handleLogout = async () =>{
-  await signOut(auth);
-  setDropdown(false);
-  setOpen(false);
- };
-
 
   // Hide nav on login & signup pages
   if (isLogin || isSignup) return null;
-const navLinks = [
+
+  const navLinks = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About Us" },
     { path: "/dashboard", label: "Dashboard" },
@@ -55,9 +56,9 @@ const navLinks = [
 
   return (
     <nav
-      className={` top-0 left-0 w-full z-30 px-6 py-4 transition-all duration-500
-      ${isHome ? "bg-transparent fixed" : "bg-gray-900/70"}
-      `}
+      className={`top-0 left-0 w-full z-30 px-6 py-4 transition-all duration-500 ${
+        isHome ? "bg-transparent fixed" : "bg-gray-900/70"
+      }`}
     >
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo */}
@@ -74,15 +75,13 @@ const navLinks = [
             <li key={link.path}>
               <Link
                 to={link.path}
-                className={`relative px-2 py-1 transition-all duration-300 
-                ${
+                className={`relative px-2 py-1 transition-all duration-300 ${
                   location.pathname === link.path
                     ? "text-green-400"
                     : "text-gray-200 hover:text-white"
                 }`}
               >
                 {link.label}
-                {/* Fancy underline */}
                 <span
                   className={`absolute left-0 bottom-0 w-full h-[2px] bg-gradient-to-r from-pink-400 to-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ${
                     location.pathname === link.path ? "scale-x-100" : ""
@@ -93,42 +92,42 @@ const navLinks = [
           ))}
         </ul>
 
-        {/* Call to Action Button */}
+        {/* Desktop Call to Action */}
         <div className="hidden md:flex gap-5">
-          {!user ?(
+          {!user ? (
             <>
-          <Link
-            to="/login"
-            className="px-5 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold shadow-lg hover:shadow-pink-500/50 transition duration-300"
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="px-4 py-2 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold shadow-lg hover:shadow-green-400/50 transition duration-300"
-          >
-            Sign Up
-          </Link>
-          </>
-          ):(
-
-            <div className="relative">
-              <button onClick={()=> setDropdown(!dropdown)}>
-                <img 
-                src={user.photoURL || Micon}
-                alt = "Profile"
-                className="-10 h-10 rounded-full border-2 border-green-400 shadow-md"/>
-              </button>
-          {dropdown && (
-            <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg py-2 text-gray-700">
-              <Link 
-              to ='/account'
-              className="block px-4 py-2 hover:bg-gray-100"
-              onClick={()=> setDropdown(false)}
+              <Link
+                to="/login"
+                className="px-5 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold shadow-lg hover:shadow-pink-500/50 transition duration-300"
               >
-                My Account
+                Login
               </Link>
               <Link
+                to="/signup"
+                className="px-4 py-2 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold shadow-lg hover:shadow-green-400/50 transition duration-300"
+              >
+                Sign Up
+              </Link>
+            </>
+          ) : (
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={() => setDropdown(!dropdown)}>
+                <img
+                  src={user.photoURL || Micon}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full border-2 border-green-400 shadow-md"
+                />
+              </button>
+              {dropdown && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg py-2 text-gray-700 z-50">
+                  <Link
+                    to="/account"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setDropdown(false)}
+                  >
+                    My Account
+                  </Link>
+                  <Link
                     to="/settings"
                     className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => setDropdown(false)}
@@ -143,7 +142,7 @@ const navLinks = [
                   </button>
                 </div>
               )}
-              </div>
+            </div>
           )}
         </div>
 
@@ -158,7 +157,11 @@ const navLinks = [
 
       {/* Mobile Drawer */}
       {open && (
-        <div className={`absolute z-40 top-16 left-0 w-full  md:hidden  rounded-b-2xl ${isHome? "bg-transparent" :"bg-gray-900/95"}`}>
+        <div
+          className={`absolute z-40 top-16 left-0 w-full md:hidden rounded-b-2xl ${
+            isHome ? "bg-transparent" : "bg-gray-900/95"
+          }`}
+        >
           <ul className="flex flex-col items-center space-y-6 py-6 text-lg font-semibold">
             {navLinks.map((link) => (
               <li key={link.path}>
@@ -175,26 +178,35 @@ const navLinks = [
                 </Link>
               </li>
             ))}
-            <li >
-              
-  {/* Login Button */}
-  <Link
-    to="/login"
-    className="px-5 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold shadow-lg hover:shadow-pink-500/50 transition duration-300"
-  >
-    Login
-  </Link>
-</li>
-<li>
-  {/* Signup Button */}
-  <Link
-    to="/signup"
-    className="px-5 py-2 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold shadow-lg hover:shadow-green-400/50 transition duration-300"
-  >
-    Signup
-  </Link>
-
-            </li>
+            {!user ? (
+              <>
+                <li>
+                  <Link
+                    to="/login"
+                    className="px-5 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold shadow-lg hover:shadow-pink-500/50 transition duration-300"
+                  >
+                    Login
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/signup"
+                    className="px-5 py-2 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold shadow-lg hover:shadow-green-400/50 transition duration-300"
+                  >
+                    Signup
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="px-5 py-2 rounded-full bg-red-500 text-white font-semibold shadow-lg hover:bg-red-600 transition duration-300"
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       )}
