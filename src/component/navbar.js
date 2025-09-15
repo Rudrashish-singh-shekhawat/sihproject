@@ -229,15 +229,15 @@ function Nav() {
                   </>
                 ) : (
                   <>
-                    <li className="w-full">
+                    <li>
                       <button
                         onClick={() => handleNavigate("/account")}
-                        className="px-5 py-2 rounded-full bg-gray-700 text-white font-semibold shadow-lg hover:bg-gray-600 transition duration-300 block w-full text-center"
+                        className="px-5 py-2 rounded-full text-white font-semibold  hover:bg-gray-600 transition duration-300 block w-full text-center"
                       >
                         Profile
                       </button>
                     </li>
-                    <li className="w-full">
+                    <li>
                       <button
                         onClick={handleLogout}
                         className="px-5 py-2 rounded-full bg-red-500 text-white font-semibold shadow-lg hover:bg-red-600 transition duration-300 block w-full text-center"

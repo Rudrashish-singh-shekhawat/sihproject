@@ -3,15 +3,21 @@ import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {app} from "../firebase";
 import { Eye, EyeOff } from "lucide-react"; // install lucide-react if not already
 import { Link, useNavigate } from "react-router-dom";
+import { getFirestore, collection, setDoc,doc } from "firebase/firestore";
 
+const firestore = getFirestore(app)
 const auth = getAuth(app)
 
 export default function Signup(){
     //taking input from user
+    const [uname, setName] = useState("");
     const [email,setEmail] =  useState("");
     const [password,setPassword] =  useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+
+
 //authantication of user and resitation 
 const creatingUser = async (e) => {
     e.preventDefault();
@@ -20,7 +26,20 @@ const creatingUser = async (e) => {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+        setLoading(true);
+        setError("");
+
+      // create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+        //adding data 
+      
+    await setDoc(doc(firestore,"User", user.uid),{
+      uid: user.uid,
+      name: uname,
+      email: email,
+      password: password,
+    },{ merge: true });
       navigate("/"); // redirect after signup
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
@@ -68,6 +87,7 @@ const creatingUser = async (e) => {
               type="text"
               id="name"
               placeholder="Enter your name"
+               onChange={(e)=>setName(e.target.value)}
               className="w-full px-4 py-2 rounded-xl bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
             />
@@ -128,7 +148,8 @@ const creatingUser = async (e) => {
             />
             <button
               type="button"
-              onClick={() =>setShowConfirm(!showConfirm)}
+              onClick={async () => {
+                    setShowConfirm(!showConfirm);}}
               className="absolute right-3 top-10.5 text-gray-400 hover:text-gray-200"
             >
               {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -143,8 +164,9 @@ const creatingUser = async (e) => {
           <button
             type="submit"
             className="w-full py-3 bg-green-600 hover:bg-green-700 rounded-xl text-white font-semibold transition-all duration-300"
+             disabled={loading}
           >
-            Sign Up
+           {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
