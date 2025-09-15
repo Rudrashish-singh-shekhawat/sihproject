@@ -4,7 +4,6 @@ import Micon from "../source/menicon.jpg"
 
 function About() {
   const developers = [
-    { name: "Kanwaraj", role: "CEO of company", img: Micon },
       { name: "Akshat", role: "software developer", img: Micon },
       { name: "Nerandra", role: "Hardware developer", img: Micon },
       { name: "Navidita", role: "solar dept. head", img: Micon },
