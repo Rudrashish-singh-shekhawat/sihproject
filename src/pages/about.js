@@ -6,7 +6,7 @@ function About() {
   const developers = [
       { name: "Akshat", role: "software developer", img: Micon },
       { name: "Nerandra", role: "Hardware developer", img: Micon },
-      { name: "Navidita", role: "solar dept. head", img: Micon },
+      { name: "Nivedita", role: "solar dept. head", img: Micon },
       { name: "Palak", role: "UI/UX Designer & developer", img: Micon },
       { name: "Rounak Agarwal", role: "Wind mill dept. head", img: Micon },
       { name: "Rudrashish", role: "Developer", img: Micon },
