@@ -146,17 +146,33 @@ function Nav() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-gray-200 focus:outline-none"
-        >
-          {open ? <X size={28} /> : <Menu size={28} />}
-        </button>
+        {/* Mobile Button: Profile if logged in, Hamburger if not */}
+<div className="md:hidden">
+  {user ? (
+    // Show profile pic on mobile
+    <div className="relative" ref={dropdownRef}>
+      <button onClick={() => setDropdown(!dropdown)}>
+        <img
+          src={user.photoURL || Micon}
+          alt="Profile"
+          className="w-10 h-10 rounded-full border-2 border-green-400 shadow-md"
+        />
+      </button>
+    </div>
+  ) : (
+    // Show hamburger menu if not logged in
+    <button
+      onClick={() => setOpen(!open)}
+      className="text-gray-200 focus:outline-none"
+    >
+      {open ? <X size={28} /> : <Menu size={28} />}
+    </button>
+  )}
+</div>
       </div>
 
       {/* Mobile Drawer */}
-      {open && (
+      {(open ||dropdown) && (
         <div
           className={`absolute z-40 top-16 left-0 w-full md:hidden rounded-b-2xl ${
             isHome ? "bg-transparent" : "bg-gray-900/95"
@@ -198,14 +214,25 @@ function Nav() {
                 </li>
               </>
             ) : (
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="px-5 py-2 rounded-full bg-red-500 text-white font-semibold shadow-lg hover:bg-red-600 transition duration-300"
-                >
-                  Logout
-                </button>
-              </li>
+             <>
+            <li>
+              <Link
+                to="/account"
+                onClick={() => setDropdown(false)}
+                className="block w-full text-center px-5 py-2 rounded-full  text-white font-semibold  hover:shadow-green-400/50 transition duration-300"
+              >
+                Profile
+              </Link>
+            </li>
+            <li >
+              <button
+                onClick={handleLogout}
+                className="block w-full text-center px-5 py-2 rounded-full bg-red-500 text-white font-semibold shadow-lg hover:bg-red-600 transition duration-300"
+              >
+                Logout
+              </button>
+            </li>
+          </>
             )}
           </ul>
         </div>
